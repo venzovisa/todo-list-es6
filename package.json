@@ -1,0 +1,32 @@
+{
+  "name": "todo-list-es6",
+  "version": "1.0.0",
+  "description": "Todo list ES6",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/venzovisa/todo-list-es6.git"
+  },
+  "author": "Ventsislav Visarionov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/venzovisa/todo-list-es6/issues"
+  },
+  "homepage": "https://github.com/venzovisa/todo-list-es6#readme",
+  "dependencies": {
+    "file-loader": "^6.2.0",
+    "image-webpack-loader": "^8.1.0",
+    "style-loader": "^3.3.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.1",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-watch-files-plugin": "^1.2.1"
+  }
+}

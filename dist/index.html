@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Todo list</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <main>
+        <h1>Todo list ES6</h1>
+        <form enctype="multipart/form-data" id="add-todo-form">
+          <label for="title">Title:</label><br>
+          <input maxlength="100" type="text" id="title" name="title" value=""><br>
+          <label for="description">Description:</label><br>
+          <input maxlength="100" type="text" id="description" name="description" value=""><br>
+          <label for="deadline">Deadline:</label><br>
+          <input maxlength="10" type="text" id="deadline" name="deadline" value=""><br><br>
+          <input type="submit" value="Submit"">
+        </form> 
+        <div class="todo-list">
+          <div class="todo">
+            
+            <div class="content">
+              <div class="title">Title</div>
+              <div class="description">Description</div>
+              <div class="deadline">06.12.23</div>
+            </div>
+            <div class="buttons">
+              <button class="edit">Edit</button>
+              <button class="delete">Delete</button>
+            </div>
+          </div>
+        </div>
+    </main>
+	<script src="main.js"></script>
+  </body>
+</html>
