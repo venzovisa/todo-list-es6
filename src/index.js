@@ -1,76 +1,74 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import "./index.css";
 import "./favicon.ico";
 
 class Todo {
-    id;
-    title;
-    description;
-    deadline;
-    disabled;
-    completed;
+  id;
+  title;
+  description;
+  deadline;
+  disabled;
+  completed;
 
-    constructor(title, description, deadline) {
-        if (!title || !description || !deadline) {
-            throw Error("Missing param");
-        }
+  constructor(title, description, deadline) {
+    if (!title || !description || !deadline) {
+      throw Error("Missing param");
+    }
 
-        this.id = uuidv4();
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
-        this.disabled = false;
-        this.completed = false;
-    };
+    this.id = uuidv4();
+    this.title = title;
+    this.description = description;
+    this.deadline = deadline;
+    this.disabled = false;
+    this.completed = false;
+  }
 }
 
 class List {
-    todos = [];
-    addTodo(todo){
-        this.todos.push(todo);
-    }
-    removeTodo(todo){
-        this.todos = this.todos.filter(t => t.id !== todo.id);
-    }
+  todos = [];
+  addTodo(todo) {
+    this.todos.push(todo);
+  }
+  removeTodo(todo) {
+    this.todos = this.todos.filter((t) => t.id !== todo.id);
+  }
 }
-
 
 const initTodos = () => {
-    const todos = window.localStorage.getItem("todos");
+  const todos = window.localStorage.getItem("todos");
 
-    if (todos) {
-        const todoListNode = document.querySelector(".todo-list");
-        Array.from(JSON.parse(todos, null, 2)).forEach(todo => {
-            todoListNode.appendChild(buildTodoNode(todo));
-        });
-    }
-} 
+  if (todos) {
+    const todoListNode = document.querySelector(".todo-list");
+    Array.from(JSON.parse(todos, null, 2)).forEach((todo) => {
+      todoListNode.appendChild(buildTodoNode(todo));
+    });
+  }
+};
 
 window.addEventListener("load", () => {
-    initTodos();
+  initTodos();
 });
 
-
 const todoForm = (title, description, deadline) => {
-    const form = document.createElement("form");
-    form.classList.add("edit-todo-form");
-    const titleInput = document.createElement("input");
-    titleInput.textContent = title;
-    const descriptionInput = document.createElement("input");
-    descriptionInput.textContent = description;
-    const deadlineInput = document.createElement("input");
-    deadlineInput.textContent = deadline;
-    const submit = document.createElement("input");
-    submit.setAttribute("type", "submit");
-    submit.value = "Save";
+  const form = document.createElement("form");
+  form.classList.add("edit-todo-form");
+  const titleInput = document.createElement("input");
+  titleInput.textContent = title;
+  const descriptionInput = document.createElement("input");
+  descriptionInput.textContent = description;
+  const deadlineInput = document.createElement("input");
+  deadlineInput.textContent = deadline;
+  const submit = document.createElement("input");
+  submit.setAttribute("type", "submit");
+  submit.value = "Save";
 
-    form.appendChild(titleInput);
-    form.appendChild(descriptionInput);
-    form.appendChild(deadlineInput);
-    form.appendChild(submit);
+  form.appendChild(titleInput);
+  form.appendChild(descriptionInput);
+  form.appendChild(deadlineInput);
+  form.appendChild(submit);
 
-    return form;
-}
+  return form;
+};
 
 const handleEdit = (todo) => {
   const todoNode = document.getElementById(todo.id);
@@ -101,16 +99,16 @@ const handleEdit = (todo) => {
   deadlineInput.classList.add("deadline");
   deadlineInput.name = "deadline";
   deadlineInput.value = todo.deadline;
-  form.appendChild(titleInput);
+  form.appendChild(deadlineInput);
 
   const submit = document.createElement("input");
   submit.type = "submit";
   submit.value = "Save";
-  submit.addEventListener("click", (e) => handleSave(e, todo))
+  form.addEventListener("submit", (e) => handleSave(e, todo));
   form.appendChild(submit);
 
-  todo.insertBefore(form, todo.querySelector(".buttons"));
-}
+  todoNode.insertBefore(form, todoNode.querySelector(".buttons"));
+};
 
 const handleSave = (e, todo) => {
   const todoNode = document.getElementById(todo.id);
@@ -118,95 +116,182 @@ const handleSave = (e, todo) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const formProps = Object.fromEntries(formData);
-  const { title, description, deadline } = formProps; 
-  const newTodo = new Todo(title, description, deadline);
-  todoNode.insertBefore(buildTodoNode(newTodo), todoNode.querySelector(".buttons"));
+  todoNode.insertBefore(
+    buildTodoContent(formProps),
+    todoNode.querySelector(".buttons")
+  );
+
+  let todos = window.localStorage.getItem("todos");
+
+  if (todos) {
+    todos = Array.from(JSON.parse(todos));
+
+    todos.forEach((t) => {
+      if (t.id === todo.id) {
+        t.title = formProps.title;
+        t.description = formProps.description;
+        t.deadline = formProps.deadline;
+        window.localStorage.setItem("todos", JSON.stringify(todos));
+      }
+    });
+  }
+
+  console.log("handleSave", JSON.parse(window.localStorage.getItem("todos")).find(t => t.id === todo.id));
+};
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const formProps = Object.fromEntries(formData);
+  const { title, description, deadline } = formProps;
+  const todo = new Todo(title, description, deadline);
+  document.querySelector(".todo-list").appendChild(buildTodoNode(todo));
 
   const todos = window.localStorage.getItem("todos");
 
   if (todos) {
-      const matchTodo = todos.find(t => t.id === todo.id);
-      if (matchTodo) {
-        matchTodo.title = todo.title;
-        matchTodo.description = todo.description;
-        matchTodo.deadline = todo.deadline;
-        window.localStorage.setItem("todos", JSON.stringify(todos));
-      }
-  } 
+    window.localStorage.setItem(
+      "todos",
+      JSON.stringify([...JSON.parse(todos), todo])
+    );
+  } else {
+    window.localStorage.setItem("todos", JSON.stringify([todo]));
+  }
 
-  console.log("handleSave", window.localStorage.getItem("todos"));
-}
-
-const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const formProps = Object.fromEntries(formData);
-    const { title, description, deadline } = formProps; 
-    const todo = new Todo(title, description, deadline);
-    document.querySelector(".todo-list").appendChild(buildTodoNode(todo));
-
-    const todos = window.localStorage.getItem("todos");
-
-    if (todos) {
-        window.localStorage.setItem("todos", JSON.stringify([...JSON.parse(todos), todo]));
-    } else {
-        window.localStorage.setItem("todos", JSON.stringify([todo]));
-    }
-
-    console.log("handleSubmit", window.localStorage.getItem("todos"));
-}
+  console.log("handleSubmit", window.localStorage.getItem("todos"));
+};
 
 const buildTodoNode = (todo) => {
-    const todoNode = document.createElement("div");
-    todoNode.classList.add("todo");
-    todoNode.id = todo.id;
+  const todoNode = document.createElement("div");
+  todoNode.classList.add("todo");
+  todoNode.id = todo.id;
 
+  const contentNode = document.createElement("div");
+  contentNode.classList.add("content");
+
+  const titleNode = document.createElement("div");
+  titleNode.classList.add("title");
+  titleNode.textContent = todo.title;
+  contentNode.appendChild(titleNode);
+
+  const descriptionNode = document.createElement("div");
+  descriptionNode.classList.add("description");
+  descriptionNode.textContent = todo.description;
+  contentNode.appendChild(descriptionNode);
+
+  const deadlineNode = document.createElement("div");
+  deadlineNode.classList.add("deadline");
+  deadlineNode.textContent = todo.deadline;
+  contentNode.appendChild(deadlineNode);
+
+  todoNode.appendChild(contentNode);
+
+  const buttons = document.createElement("div");
+  buttons.classList.add("buttons");
+
+  const editNode = document.createElement("div");
+  editNode.classList.add("edit");
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.disabled = todo.disabled;
+  editBtn.addEventListener("click", () => handleEdit(todo));
+  editNode.appendChild(editBtn);
+  buttons.appendChild(editNode);
+
+  const deleteNode = document.createElement("div");
+  deleteNode.classList.add("delete");
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.disabled = todo.disabled;
+  deleteBtn.addEventListener("click", () => handleRemove(todo.id));
+  deleteNode.appendChild(deleteBtn);
+  buttons.appendChild(deleteNode);
+
+  const completed = document.createElement("input");
+  completed.type = "checkbox";
+  completed.checked = todo.completed;
+  completed.disabled = todo.disabled;
+  completed.classList.add("completed");
+  completed.addEventListener("click", () => {
+    let todos = window.localStorage.getItem("todos");
+
+    if (todos) {
+      todos = Array.from(JSON.parse(todos));
+      todos.forEach((t) => {
+        if (t.id === todo.id) {
+          t.completed = !t.completed;
+          window.localStorage.setItem("todos", JSON.stringify(todos));
+        }
+      });
+    }
+  
+  })
+  buttons.appendChild(completed);
+
+  const disabled = document.createElement("input");
+  disabled.type = "checkbox";
+  disabled.checked = todo.disabled;
+  disabled.disabled = todo.disabled;
+  disabled.classList.add("disabled");
+  disabled.addEventListener("click", () => {
+    let todos = window.localStorage.getItem("todos");
+
+    if (todos) {
+      todos = Array.from(JSON.parse(todos));
+      todos.forEach((t) => {
+        if (t.id === todo.id) {
+          t.disabled = true;
+          window.localStorage.setItem("todos", JSON.stringify(todos));
+          const todoNode = document.getElementById(todo.id);
+          todoNode.querySelector(".edit button").disabled = true;
+          todoNode.querySelector(".delete button").disabled = true;
+          todoNode.querySelector(".completed").disabled = true;
+          todoNode.querySelector(".disabled").disabled = true;
+        }
+      });
+    }
+  
+  })
+
+  buttons.appendChild(disabled);
+  todoNode.appendChild(buttons);
+
+  return todoNode;
+};
+
+const buildTodoContent = (todo) => {
     const contentNode = document.createElement("div");
     contentNode.classList.add("content");
-
+  
     const titleNode = document.createElement("div");
     titleNode.classList.add("title");
     titleNode.textContent = todo.title;
     contentNode.appendChild(titleNode);
-
+  
     const descriptionNode = document.createElement("div");
     descriptionNode.classList.add("description");
     descriptionNode.textContent = todo.description;
     contentNode.appendChild(descriptionNode);
-
+  
     const deadlineNode = document.createElement("div");
     deadlineNode.classList.add("deadline");
     deadlineNode.textContent = todo.deadline;
     contentNode.appendChild(deadlineNode);
-
-    todoNode.appendChild(contentNode);
-
-    const buttons = document.createElement("div");
-    buttons.classList.add("buttons");
-
-    const editNode = document.createElement("div");
-    editNode.classList.add("edit");
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit";
-    editBtn.addEventListener("click", () => handleEdit(todo))
-    editNode.appendChild(editBtn);
-    buttons.appendChild(editNode);
-
-    const deleteNode = document.createElement("div");
-    deleteNode.classList.add("delete");
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "Delete";
-    deleteBtn.addEventListener("click", () => handleRemove(todo.id))
-    deleteNode.appendChild(deleteBtn);
-    buttons.appendChild(deleteNode);
-
-    todoNode.appendChild(buttons);
-
-    return todoNode;
+  
+    return contentNode;
 }
 
 const handleRemove = (todoId) => {
-    document.getElementById(todoId)?.remove();
-}
+  document.getElementById(todoId)?.remove();
+  let todos = window.localStorage.getItem("todos");
 
-document.querySelector("#add-todo-form").addEventListener("submit", handleSubmit);
+  if (todos) {
+    todos = Array.from(JSON.parse(todos));
+    todos = todos.filter(t => t.id !== todoId);
+    window.localStorage.setItem("todos", JSON.stringify(todos));
+  }
+};
+
+document
+  .querySelector("#add-todo-form")
+  .addEventListener("submit", handleSubmit);
