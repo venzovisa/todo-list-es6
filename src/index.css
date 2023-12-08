@@ -3,35 +3,58 @@ main {
   max-width: 1280px;
 }
 
-.todo-list {
+.todo,
+#add-todo-form {
+  display: grid;
+  margin: 4px 0;
+  gap: 5px;
+  grid-template-columns: 3fr 1fr;
 }
 
 .todo {
-    display: grid;
-    margin: 4px 0;
-    gap: 5px;
-    grid-template-columns: 3fr 1fr;
+  border-radius: 4px;
+  padding: 2px;
+  background: #dadada;
+}
+
+#add-todo-form {
+  margin-bottom: 48px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+#submit {
+  max-width: 100px;
 }
 
 .content {
-    display: grid;
-    gap: 5px;
-    grid-template-columns: 1fr 1fr 1fr;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
 }
 
 .title {
-    grid-column-start: 1;
+  grid-column-start: 1;
 }
 
 .description {
-    grid-column-start: 2;
+  grid-column-start: 2;
 }
 
 .deadline {
-    grid-column-start: 3;
+  grid-column-start: 3;
+}
+
+.expired:after {
+  margin-left: 4px;
+  content: "(expired)";
 }
 
 .buttons {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
+}
+
+button {
+  margin: 0 4px;
 }
